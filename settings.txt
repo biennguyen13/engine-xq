@@ -1,0 +1,51 @@
+[小虫象棋配置文件]
+[如要取消某项设置，可以用中括号把该项内容括起来]
+OverseaServer = true
+[协议: 0为UCI，兵河五四、鹏飞是UCI；1为UCCI，象棋巫师为UCCI]
+Protocol = 0
+
+[线程数]
+Threads = 4
+
+[哈希表: 1分钟到10分钟快棋建议设置1024 = 1GB，10分钟以上建议设置2048 = 2GB]
+Hash = 1024
+
+[藐视因子]
+Contempt = 0
+
+[ZeroAlgorithm辅助审局]
+EnableZeroAlgorithm = false
+
+[知识库: true开启，false关闭]
+Knowledge = false
+
+[优化超快棋: true开启，false关闭]
+OptimizeForBlitz = false
+
+[审局库开关: true启用审局库，false关闭审局库]
+EgtbEnable = true
+
+
+[审局库路径: 路径不能包含空格，一行放置一个目录，可以同时放置多个目录,目录可以在不同盘]
+[EgtbPath = E:\EGTB\WDL
+[EgtbPath = C:\EGTB\DTC
+
+
+[审局库探测深度: 机械硬盘设置12或更大，固态硬盘设置6，速度越快的硬盘可以设置得越小，但一般应不小于2]
+EgtbProbeDepth = 16
+
+
+[特殊棋规设置: true开启，false关闭；开启后着法次数限制生效]
+MoveskyRule = true
+
+[单子长将的次数限制: 5-100]
+OnePieceCheckCount = 7
+
+[两子交替长将的次数限制: 7-100]
+TwoPieceCheckCount = 13
+
+[多子交替长将的次数限制: 13-100]
+ThreePieceCheckCount = 19
+
+
+
