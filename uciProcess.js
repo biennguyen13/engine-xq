@@ -3,11 +3,12 @@ import { exec } from "child_process"
 export default class UCIProcess {
   constructor(id, thread = 1, hash = 1) {
     this.stepCount = 100
-    this.id = id
+    this.id = "--== Engine_" + id + " ==--"
     this.isEngineReady = false
     this.analyze = []
     this.isWriting = false
     this.uciProcess = exec("BugChessNN_20200919_release_AVX2.exe")
+    this.io = null
 
     this.start(thread, hash)
   }
@@ -15,21 +16,27 @@ export default class UCIProcess {
   start(thread = 1, hash = 1) {
     this.uciProcess.stdin.write("uci\n")
     this.uciProcess.stdout.on("data", (data) => {
-      console.log(`Engine "${this.id}" output: ${data}`)
+      console.log(`"${this.id}" Engine output: ${data}`)
 
       if (data.includes("uciok")) {
-        console.log("Engine ready: " + this.id)
+        console.log(`"${this.id}" Engine ready`)
         this.isEngineReady = true
         this.uciProcess.stdin.write(`setoption name Threads value ${thread}\n`)
         this.uciProcess.stdin.write(`setoption name Hash value ${hash}\n`)
       }
 
       if (data.includes("bestmove")) {
+        if (this.io) {
+          this.io.emit("analyze", `"${this.id}" ${data}`)
+        }
         this.analyze.push(data)
         this.uciProcess.stdin.write("stop\n")
         this.isWriting = false
       }
       if (this.isWriting) {
+        if (this.io) {
+          this.io.emit("analyze", `"${this.id}" ${data}`)
+        }
         this.analyze.push(data)
       }
     })
@@ -39,11 +46,14 @@ export default class UCIProcess {
     })
   }
 
-  async startAnalyze(moves = "", depth = 25) {
+  async startAnalyze(moves = "", depth = 25, io) {
+    if (!this.isEngineReady) return null
+
+    this.io = io
     this.analyze = []
     this.isWriting = true
-
     this.isEngineReady = false
+
     this.uciProcess.stdin.write(`position startpos moves ${moves}\n`)
     this.uciProcess.stdin.write(`go depth ${depth}\n`)
 
@@ -51,7 +61,7 @@ export default class UCIProcess {
       let count = 0
       const _ = setInterval(() => {
         count += this.stepCount
-        console.log(`Engine "${this.id}" count: ${count}`)
+        console.log(`"${this.id}" Engine count: ${count}`)
         if (count > 30000) {
           this.uciProcess.stdin.write("stop\n")
         }
@@ -61,6 +71,8 @@ export default class UCIProcess {
         }
       }, this.stepCount)
     })
+
+    this.io = null
     this.isEngineReady = true
 
     return data
