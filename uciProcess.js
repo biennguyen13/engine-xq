@@ -9,6 +9,7 @@ export default class UCIProcess {
     this.isWriting = false
     this.uciProcess = exec("BugChessNN_20200919_release_AVX2.exe")
     this.io = null
+    this.socket = null
 
     this.start(thread, hash)
   }
@@ -26,17 +27,13 @@ export default class UCIProcess {
       }
 
       if (data.includes("bestmove")) {
-        if (this.io) {
-          this.io.emit("analyze", `"${this.id}" ${data}`)
-        }
+        this.io?.to?.(this.socket?.id)?.emit("analyze", `"${this.id}" ${data}`)
         this.analyze.push(data)
         this.uciProcess.stdin.write("stop\n")
         this.isWriting = false
       }
       if (this.isWriting) {
-        if (this.io) {
-          this.io.emit("analyze", `"${this.id}" ${data}`)
-        }
+        this.io?.to?.(this.socket?.id)?.emit("analyze", `"${this.id}" ${data}`)
         this.analyze.push(data)
       }
     })
@@ -46,10 +43,11 @@ export default class UCIProcess {
     })
   }
 
-  async startAnalyze(moves = "", depth = 25, io) {
+  async startAnalyze(moves = "", depth = 25, io, socket) {
     if (!this.isEngineReady) return null
 
     this.io = io
+    this.socket = socket
     this.analyze = []
     this.isWriting = true
     this.isEngineReady = false
@@ -73,6 +71,7 @@ export default class UCIProcess {
     })
 
     this.io = null
+    this.socket = null
     this.isEngineReady = true
 
     return data

@@ -14,19 +14,23 @@ io.on("connection", (socket) => {
 
   // Xử lý khi nhận tin nhắn từ client
   socket.on("message", (msg) => {
-    console.log(`Received message: `, msg)
-    // Gửi tin nhắn cho tất cả client
-    io.emit("message", msg)
+    // console.log(`Received message: `, msg)
+    // // Gửi tin nhắn cho tất cả client
+    // io.emit("message", msg)
+    // io.to(socket.id).emit("message", {
+    //   sender: socket.username,
+    //   message: data.message,
+    // })
   })
 
   socket.on("analyze", (msg) => {
     const uciProcess = uciProcessPooling.popReady()
 
     if (!uciProcess) {
-      io.emit("analyze", "Out of pooling")
+      io.to(socket.id).emit("analyze", "Out of pooling")
     } else {
       const { moves = "", depth = 25 } = msg
-      uciProcess.startAnalyze(moves, depth, io)
+      uciProcess.startAnalyze(moves, depth, io, socket)
     }
   })
 
