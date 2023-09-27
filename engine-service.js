@@ -4,51 +4,80 @@ const port = 3000 // Chọn một cổng bạn muốn sử dụng
 const { exec } = require("child_process")
 const fs = require("fs")
 
-app.get("/", async (req, res) => {
-  res.send({ message: "Chào mừng đến với dịch vụ của tôi!" })
-})
+let isEngineReady = false
+let analyze = []
+let isWriting = false
 
-app.listen(port, () => {
-  console.log(`Máy chủ đang lắng nghe tại http://localhost:${port}`)
-})
+const EngineInit = () => {
+  const uciProcess = exec("BugChessNN_20200919_release_AVX2.exe")
 
-const runEngine = () => {
-  // Đường dẫn đến động cơ cờ vua
-  const enginePath = "BugChessNN_20200919_release_AVX2.exe"
-
-  // Lệnh để khởi động động cơ cờ vua
-  const command = `${enginePath}`
-
-  // Tạo một tiến trình con để tương tác với động cơ cờ vua
-  const uciProcess = exec(command)
-
-  // Mở một tệp văn bản để ghi kết quả của động cơ
-  const outputFile = fs.createWriteStream("engine_output.txt")
-
-  // Gửi lệnh UCI
   uciProcess.stdin.write("uci\n")
 
-  // Xử lý phản hồi từ động cơ cờ vua và ghi vào tệp văn bản
   uciProcess.stdout.on("data", (data) => {
-    const dataString = data.toString()
-    console.log(dataString)
+    console.log(data)
 
-    // Ghi dữ liệu vào tệp văn bản
-    outputFile.write(dataString)
-
-    // Dừng tiến trình sau khi nhận được dòng 'uciok'
     if (data.includes("uciok")) {
-      uciProcess.stdin.write("go depth 25\n")
+      isEngineReady = true
+      uciProcess.stdin.write("setoption name Hash value 1\n")
     }
+
     if (data.includes("bestmove")) {
+      analyze.push(data)
       uciProcess.stdin.write("stop\n")
-      uciProcess.kill()
+      isWriting = false
+    }
+    if (isWriting) {
+      analyze.push(data)
     }
   })
 
-  // Đóng kết nối khi tiến trình con kết thúc và đóng tệp văn bản
   uciProcess.on("exit", () => {
-    console.log("Kết thúc tương tác với động cơ cờ vua.")
-    outputFile.end() // Đóng tệp văn bản khi tiến trình con kết thúc
+    console.log("Engine exited.")
   })
+
+  return uciProcess
 }
+
+const uciProcess = EngineInit()
+
+app
+  .listen(port, () => {
+    console.log(`Máy chủ đang lắng nghe tại http://localhost:${port}`)
+  })
+  .on("close", () => {
+    console.log("Server đã được đóng.")
+    uciProcess.kill()
+  })
+
+app.get("/engine", async (req, res) => {
+  const moves = req.query.moves ?? ""
+  const depth = req.query.depth ?? 25
+
+  if (!isEngineReady) {
+    return res.send({ message: "No ready" })
+  }
+
+  analyze = []
+  isWriting = true
+
+  isEngineReady = false
+  uciProcess.stdin.write(`position startpos moves ${moves}\n`)
+  uciProcess.stdin.write(`go depth ${depth}\n`)
+  const data = await new Promise((res) => {
+    let count = 0
+    const _ = setInterval(() => {
+      count += 100
+      console.log("%cengine-service.js line:64 count", "color: #007acc;", count)
+      if (count > 30000) {
+        uciProcess.stdin.write("stop\n")
+      }
+      if (!isWriting) {
+        res(analyze)
+        clearInterval(_)
+      }
+    }, 100)
+  })
+  isEngineReady = true
+
+  return res.send({ message: `Depth: ${depth}, moves: ${moves}`, data })
+})

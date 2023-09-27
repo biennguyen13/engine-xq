@@ -4,7 +4,7 @@
     "description": "Mô tả dự án của bạn",
     "main": "app.js",
     "scripts": {
-        "start": "node engine-service.js"
+        "start": "nodemon engine-service.js"
     },
     "author": "Your Name",
     "license": "MIT",
