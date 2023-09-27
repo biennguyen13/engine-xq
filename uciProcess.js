@@ -1,15 +1,9 @@
-const { exec } = require("child_process")
+import { exec } from "child_process"
 
-class EngineProcess {
-  id: string
-  isEngineReady: boolean
-  analyze: never[]
-  isWriting: boolean
-  uciProcess: null
-  stepCount: number
-  constructor(thread = 1, hash = 1) {
+export default class UCIProcess {
+  constructor(id, thread = 1, hash = 1) {
     this.stepCount = 100
-    this.id = Math.random().toString(36)
+    this.id = id
     this.isEngineReady = false
     this.analyze = []
     this.isWriting = false
@@ -21,9 +15,10 @@ class EngineProcess {
   start(thread = 1, hash = 1) {
     this.uciProcess.stdin.write("uci\n")
     this.uciProcess.stdout.on("data", (data) => {
-      console.log(data)
+      console.log(`Engine "${this.id}" output: ${data}`)
 
       if (data.includes("uciok")) {
+        console.log("Engine ready: " + this.id)
         this.isEngineReady = true
         this.uciProcess.stdin.write(`setoption name Threads value ${thread}\n`)
         this.uciProcess.stdin.write(`setoption name Hash value ${hash}\n`)
@@ -56,7 +51,7 @@ class EngineProcess {
       let count = 0
       const _ = setInterval(() => {
         count += this.stepCount
-        console.log("engine.js line:57 count", count)
+        console.log(`Engine "${this.id}" count: ${count}`)
         if (count > 30000) {
           this.uciProcess.stdin.write("stop\n")
         }
@@ -69,5 +64,9 @@ class EngineProcess {
     this.isEngineReady = true
 
     return data
+  }
+
+  kill() {
+    this.uciProcess.kill()
   }
 }
