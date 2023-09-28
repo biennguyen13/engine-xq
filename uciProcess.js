@@ -2,7 +2,7 @@ import { exec } from "child_process"
 
 export default class UCIProcess {
   constructor(id, thread = 1, hash = 1) {
-    this.stepCount = 100
+    this.stepCount = 200
     this.id = "--== Engine_" + id + " ==--"
     this.isEngineReady = false
     this.analyze = []
@@ -10,6 +10,7 @@ export default class UCIProcess {
     this.uciProcess = exec("BugChessNN_20200919_release_AVX2.exe")
     this.io = null
     this.socket = null
+    this.requestSocketId = null
 
     this.start(thread, hash)
   }
@@ -27,13 +28,19 @@ export default class UCIProcess {
       }
 
       if (data.includes("bestmove")) {
-        this.io?.to?.(this.socket?.id)?.emit("analyze", `"${this.id}" ${data}`)
+        this.io?.to?.(this.socket?.id)?.emit("analyze", {
+          msg: `"${this.id}" ${data}`,
+          requestSocketId: this.requestSocketId,
+        })
         this.analyze.push(data)
         this.uciProcess.stdin.write("stop\n")
         this.isWriting = false
       }
       if (this.isWriting) {
-        this.io?.to?.(this.socket?.id)?.emit("analyze", `"${this.id}" ${data}`)
+        this.io?.to?.(this.socket?.id)?.emit("analyze", {
+          msg: `"${this.id}" ${data}`,
+          requestSocketId: this.requestSocketId,
+        })
         this.analyze.push(data)
       }
     })
@@ -43,11 +50,13 @@ export default class UCIProcess {
     })
   }
 
-  async startAnalyze(moves = "", depth = 25, io, socket) {
+  async startAnalyze(moves = "", depth = 25, io, socket, requestSocketId) {
     if (!this.isEngineReady) return null
 
     this.io = io
     this.socket = socket
+    this.requestSocketId = requestSocketId
+
     this.analyze = []
     this.isWriting = true
     this.isEngineReady = false
@@ -72,6 +81,8 @@ export default class UCIProcess {
 
     this.io = null
     this.socket = null
+    this.requestSocketId = null
+
     this.isEngineReady = true
 
     return data

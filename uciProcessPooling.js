@@ -5,7 +5,7 @@ export default class UCIProcessPooling {
     this.poolNumber = min
     this.maxpoolNumber = max
     this.pooling = new Array(this.poolNumber).fill(null).map((_, index) => {
-      return new UCIProcess(index, 1, 1)
+      return new UCIProcess(index, 1, 512)
     })
   }
 
