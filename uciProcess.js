@@ -2,20 +2,24 @@ import { exec } from "child_process"
 
 export default class UCIProcess {
   constructor(id, thread = 1, hash = 1) {
-    this.stepCount = 200
+    this.thread = thread
+    this.hash = hash
+    this.stepCount = 1000
     this.id = "--== Engine_" + id + " ==--"
     this.isEngineReady = false
     this.analyze = []
     this.isWriting = false
-    this.uciProcess = exec("BugChessNN_20200919_release_AVX2.exe")
+    this.uciProcess = null
     this.io = null
     this.socket = null
     this.requestSocketId = null
 
-    this.start(thread, hash)
+    this.start(this.thread, this.hash)
   }
 
   start(thread = 1, hash = 1) {
+    this.uciProcess = exec("BugChessNN_20200919_release_AVX2.exe")
+
     this.uciProcess.stdin.write("uci\n")
     this.uciProcess.stdout.on("data", (data) => {
       console.log(`"${this.id}" Engine output: ${data}`)
@@ -69,7 +73,7 @@ export default class UCIProcess {
       const _ = setInterval(() => {
         count += this.stepCount
         console.log(`"${this.id}" Engine count: ${count}`)
-        if (count > 30000) {
+        if (count >= 30000) {
           this.uciProcess.stdin.write("stop\n")
         }
         if (!this.isWriting) {
