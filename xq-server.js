@@ -8,7 +8,7 @@ const server = createServer(app)
 const io = new Server(server)
 
 // Tạo socket client để kết nối với Server1
-const socketClient = ioClient.connect("http://localhost:3001/", {
+const socketClient = ioClient.connect("http://localhost:3011/", {
   reconnection: true,
 })
 socketClient.on("connect", function () {
@@ -43,7 +43,7 @@ io.on("connection", (socket) => {
   })
 })
 
-const port = 3000
+const port = 3010
 server
   .listen(port, () => {
     console.log(`Máy chủ đang lắng nghe tại http://localhost:${port}`)

@@ -38,7 +38,7 @@ io.on("connection", (socket) => {
 
 const uciProcessPooling = new UCIProcessPooling(2, 4)
 
-const port = 3001
+const port = 3011
 
 server
   .listen(port, () => {
