@@ -29,7 +29,7 @@ io.on("connection", (socket) => {
   // Xử lý khi nhận tin nhắn từ client
   socket.on("message", (msg) => {
     console.log("Client message to Server2", socket.id, socket.client.id)
-    // Gửi tin nhắn đến Server1
+    // Gửi tin nhắn đến tất cả client
     io.emit("message", msg)
   })
 

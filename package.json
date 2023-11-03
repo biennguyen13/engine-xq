@@ -7,7 +7,8 @@
     "scripts": {
         "start": "nodemon xq-engine-service.js",
         "start:2": "nodemon xq-server.js",
-        "start:all": "concurrently \"nodemon xq-engine-service.js\" \"nodemon xq-server.js\" "
+        "start:all:watch": "concurrently \"nodemon xq-engine-service.js\" \"nodemon xq-server.js\" ",
+        "start:all": "concurrently \"node xq-engine-service.js\" \"node xq-server.js\" "
     },
     "author": "Your Name",
     "license": "MIT",

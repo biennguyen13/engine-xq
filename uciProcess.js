@@ -5,6 +5,7 @@ export default class UCIProcess {
     this.thread = thread
     this.hash = hash
     this.stepCount = 1000
+    this.timeout = 40000
     this.id = "--== Engine_" + id + " ==--"
     this.isEngineReady = false
     this.analyze = []
@@ -73,7 +74,7 @@ export default class UCIProcess {
       const _ = setInterval(() => {
         count += this.stepCount
         console.log(`"${this.id}" Engine count: ${count}`)
-        if (count >= 30000) {
+        if (count >= this.timeout) {
           this.uciProcess.stdin.write("stop\n")
         }
         if (!this.isWriting) {
