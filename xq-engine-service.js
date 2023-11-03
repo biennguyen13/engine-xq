@@ -17,7 +17,7 @@ io.on("connection", (socket) => {
   })
 
   socket.on("analyze", (msg, requestSocketId) => {
-    const uciProcess = uciProcessPooling.popReady()
+    const uciProcess = uciProcessPooling.popReady(requestSocketId)
 
     if (!uciProcess) {
       io.to(socket.id).emit("analyze", {
@@ -33,6 +33,11 @@ io.on("connection", (socket) => {
       // uciProcess.startAnalyze(moves, depth, io, socket, requestSocketId)
       uciProcess.startAnalyze(FEN, depth, io, socket, requestSocketId)
     }
+  })
+
+  socket.on("cancelAnalyze", (requestSocketId) => {
+    console.log("cancelAnalyze", requestSocketId)
+    uciProcessPooling.stop(requestSocketId)
   })
 
   // Xử lý khi client ngắt kết nối

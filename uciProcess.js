@@ -5,7 +5,7 @@ export default class UCIProcess {
     this.thread = thread
     this.hash = hash
     this.stepCount = 1000
-    this.timeout = 40000
+    this.timeout = 10000
     this.id = "--== Engine_" + id + " ==--"
     this.isEngineReady = false
     this.analyze = []
@@ -14,6 +14,7 @@ export default class UCIProcess {
     this.io = null
     this.socket = null
     this.requestSocketId = null
+    this.FEN = null
 
     this.start(this.thread, this.hash)
   }
@@ -34,9 +35,10 @@ export default class UCIProcess {
 
       if (data.includes("bestmove")) {
         this.io?.to?.(this.socket?.id)?.emit("analyze", {
-          // msg: `"${this.id}" ${data}`,
-          msg: `${data}`,
+          msg: `"${this.id}" ${data}`,
+          // msg: `${data}`,
           requestSocketId: this.requestSocketId,
+          FEN: this.FEN,
         })
         this.analyze.push(data)
         this.uciProcess.stdin.write("stop\n")
@@ -44,9 +46,10 @@ export default class UCIProcess {
       }
       if (this.isWriting) {
         this.io?.to?.(this.socket?.id)?.emit("analyze", {
-          // msg: `"${this.id}" ${data}`,
-          msg: `${data}`,
+          msg: `"${this.id}" ${data}`,
+          // msg: `${data}`,
           requestSocketId: this.requestSocketId,
+          FEN: this.FEN,
         })
         this.analyze.push(data)
       }
@@ -63,6 +66,7 @@ export default class UCIProcess {
     this.io = io
     this.socket = socket
     this.requestSocketId = requestSocketId
+    this.FEN = FEN
 
     this.analyze = []
     this.isWriting = true
@@ -90,6 +94,7 @@ export default class UCIProcess {
     this.io = null
     this.socket = null
     this.requestSocketId = null
+    this.FEN = null
 
     this.isEngineReady = true
 
@@ -98,5 +103,12 @@ export default class UCIProcess {
 
   kill() {
     this.uciProcess.kill()
+    this.isEngineReady = false
+  }
+
+  stop() {
+    this.uciProcess.stdin.write("stop\n")
+    this.isEngineReady = true
+    console.log(this.id + " cancelAnalyze", this.requestSocketId)
   }
 }

@@ -9,11 +9,24 @@ export default class UCIProcessPooling {
     })
   }
 
-  popReady() {
+  popReady(requestSocketId) {
+    const isSocketIdInProcess = this.pooling.some(
+      ({ requestSocketId: socketid }) => socketid === requestSocketId
+    )
+    if (isSocketIdInProcess) {
+      return null
+    }
+
     return this.pooling.find(({ isEngineReady }) => isEngineReady) ?? null
   }
 
   killAll() {
     this.pooling.forEach((item) => item.kill())
+  }
+
+  stop(requestSocketId) {
+    this.pooling
+      .find((item) => item.requestSocketId === requestSocketId)
+      ?.stop()
   }
 }
