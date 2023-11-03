@@ -25,8 +25,13 @@ io.on("connection", (socket) => {
         requestSocketId,
       })
     } else {
-      const { moves = "", depth = 25 } = msg
-      uciProcess.startAnalyze(moves, depth, io, socket, requestSocketId)
+      const {
+        moves = "",
+        depth = 25,
+        FEN = "rnbakabnr/9/1c5c1/p1p1p1p1p/9/9/P1P1P1P1P/1C5C1/9/RNBAKABNR w",
+      } = msg
+      // uciProcess.startAnalyze(moves, depth, io, socket, requestSocketId)
+      uciProcess.startAnalyze(FEN, depth, io, socket, requestSocketId)
     }
   })
 
@@ -50,7 +55,7 @@ server
   })
 
 app.get("/engine", async (req, res) => {
-  const moves = req.query.moves ?? ""
+  const FEN = req.query.FEN ?? ""
   const depth = req.query.depth ?? 25
 
   const uciProcess = uciProcessPooling.popReady()
@@ -60,7 +65,8 @@ app.get("/engine", async (req, res) => {
   }
 
   return res.send({
-    message: `Depth: ${depth}, moves: ${moves}`,
-    data: await uciProcess.startAnalyze(moves, depth),
+    // message: `Depth: ${depth}, moves: ${moves}`,
+    message: `Depth: ${depth}, FEN: ${FEN}`,
+    data: await uciProcess.startAnalyze(FEN, depth),
   })
 })

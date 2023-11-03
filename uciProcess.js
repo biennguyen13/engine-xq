@@ -34,7 +34,8 @@ export default class UCIProcess {
 
       if (data.includes("bestmove")) {
         this.io?.to?.(this.socket?.id)?.emit("analyze", {
-          msg: `"${this.id}" ${data}`,
+          // msg: `"${this.id}" ${data}`,
+          msg: `${data}`,
           requestSocketId: this.requestSocketId,
         })
         this.analyze.push(data)
@@ -43,7 +44,8 @@ export default class UCIProcess {
       }
       if (this.isWriting) {
         this.io?.to?.(this.socket?.id)?.emit("analyze", {
-          msg: `"${this.id}" ${data}`,
+          // msg: `"${this.id}" ${data}`,
+          msg: `${data}`,
           requestSocketId: this.requestSocketId,
         })
         this.analyze.push(data)
@@ -55,7 +57,7 @@ export default class UCIProcess {
     })
   }
 
-  async startAnalyze(moves = "", depth = 25, io, socket, requestSocketId) {
+  async startAnalyze(FEN = "", depth = 25, io, socket, requestSocketId) {
     if (!this.isEngineReady) return null
 
     this.io = io
@@ -66,7 +68,8 @@ export default class UCIProcess {
     this.isWriting = true
     this.isEngineReady = false
 
-    this.uciProcess.stdin.write(`position startpos moves ${moves}\n`)
+    // this.uciProcess.stdin.write(`position startpos moves ${moves}\n`)
+    this.uciProcess.stdin.write(`position fen ${FEN}\n`)
     this.uciProcess.stdin.write(`go depth ${depth}\n`)
 
     const data = await new Promise((res) => {
