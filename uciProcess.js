@@ -5,7 +5,7 @@ export default class UCIProcess {
     this.thread = thread
     this.hash = hash
     this.stepCount = 1000
-    this.timeout = 10000
+    this.timeout = 100000
     this.id = "--== Engine_" + id + " ==--"
     this.isEngineReady = false
     this.analyze = []
@@ -24,7 +24,7 @@ export default class UCIProcess {
 
     this.uciProcess.stdin.write("uci\n")
     this.uciProcess.stdout.on("data", (data) => {
-      console.log(`"${this.id}" Engine output: ${data}`)
+      console.log(`"${this.id}" -> ${data}`)
 
       if (data.includes("uciok")) {
         console.log(`"${this.id}" Engine ready`)
@@ -35,8 +35,8 @@ export default class UCIProcess {
 
       if (data.includes("bestmove")) {
         this.io?.to?.(this.socket?.id)?.emit("analyze", {
-          msg: `"${this.id}" ${data}`,
-          // msg: `${data}`,
+          // msg: `"${this.id}" ${data}`,
+          msg: `${data}`,
           requestSocketId: this.requestSocketId,
           FEN: this.FEN,
         })
@@ -46,8 +46,8 @@ export default class UCIProcess {
       }
       if (this.isWriting) {
         this.io?.to?.(this.socket?.id)?.emit("analyze", {
-          msg: `"${this.id}" ${data}`,
-          // msg: `${data}`,
+          // msg: `"${this.id}" ${data}`,
+          msg: `${data}`,
           requestSocketId: this.requestSocketId,
           FEN: this.FEN,
         })

@@ -21,6 +21,7 @@ io.on("connection", (socket) => {
 
     if (!uciProcess) {
       io.to(socket.id).emit("analyze", {
+        status: "BUSY",
         msg: "Out of pooling",
         requestSocketId,
       })
