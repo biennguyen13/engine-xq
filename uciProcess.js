@@ -5,10 +5,10 @@ export default class UCIProcess {
     this.thread = thread
     this.hash = hash
     this.stepCount = 1000
-    this.timeout = 100000
+    this.timeout = 180000
     this.id = "--== Engine_" + id + " ==--"
     this.isEngineReady = false
-    this.analyze = []
+    // this.analyze = []
     this.isWriting = false
     this.uciProcess = null
     this.io = null
@@ -40,8 +40,8 @@ export default class UCIProcess {
           requestSocketId: this.requestSocketId,
           FEN: this.FEN,
         })
-        this.analyze.push(data)
-        this.uciProcess.stdin.write("stop\n")
+        // this.analyze.push(data)
+        // this.uciProcess.stdin.write("stop\n")
         this.isWriting = false
       }
       if (this.isWriting) {
@@ -51,7 +51,7 @@ export default class UCIProcess {
           requestSocketId: this.requestSocketId,
           FEN: this.FEN,
         })
-        this.analyze.push(data)
+        // this.analyze.push(data)
       }
     })
 
@@ -68,7 +68,7 @@ export default class UCIProcess {
     this.requestSocketId = requestSocketId
     this.FEN = FEN
 
-    this.analyze = []
+    // this.analyze = []
     this.isWriting = true
     this.isEngineReady = false
 
@@ -85,7 +85,8 @@ export default class UCIProcess {
           this.uciProcess.stdin.write("stop\n")
         }
         if (!this.isWriting) {
-          res(this.analyze)
+          // res(this.analyze)
+          res([])
           clearInterval(_)
         }
       }, this.stepCount)
@@ -97,6 +98,7 @@ export default class UCIProcess {
     this.FEN = null
 
     this.isEngineReady = true
+    // this.analyze = []
 
     return data
   }
@@ -108,7 +110,11 @@ export default class UCIProcess {
 
   stop() {
     this.uciProcess.stdin.write("stop\n")
-    this.isEngineReady = true
-    console.log(this.id + " cancelAnalyze", this.requestSocketId)
+    // this.isEngineReady = true
+    console.log(
+      "uci Process ========> cancelAnalyze ",
+      this.id,
+      this.requestSocketId
+    )
   }
 }

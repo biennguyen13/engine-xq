@@ -37,7 +37,7 @@ io.on("connection", (socket) => {
   })
 
   socket.on("cancelAnalyze", (requestSocketId) => {
-    console.log("cancelAnalyze", requestSocketId)
+    console.log("Xq engine service ========> cancelAnalyze ", requestSocketId)
     uciProcessPooling.stop(requestSocketId)
   })
 
