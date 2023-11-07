@@ -24,7 +24,7 @@ export default class UCIProcess {
 
     this.uciProcess.stdin.write("uci\n")
     this.uciProcess.stdout.on("data", (data) => {
-      console.log(`"${this.id}" -> ${data}`)
+      console.log(`"${this.id}" ->${this.requestSocketId} ${data}`)
 
       if (data.includes("uciok")) {
         console.log(`"${this.id}" Engine ready`)

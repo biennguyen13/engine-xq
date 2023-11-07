@@ -13,15 +13,14 @@ const socketClient = ioClient.connect("http://localhost:3011/", {
 })
 socketClient.on("connect", function () {
   console.log("Server2 connected to Server1")
-
-  socketClient.on("analyze", function ({ msg, requestSocketId }) {
-    console.log("analyze message from the Server1:", msg)
-    // socketClient.emit("analyze", "thanks server! for sending '" + data + "'")
-
-    io.to(requestSocketId).emit("analyze", { msg })
-  })
 })
 
+socketClient.on("analyze", function ({ msg, requestSocketId }) {
+  console.log("analyze message from the Server1:", msg)
+  // socketClient.emit("analyze", "thanks server! for sending '" + data + "'")
+
+  io.to(requestSocketId).emit("analyze", { msg })
+})
 // Xử lý khi có kết nối mới
 io.on("connection", (socket) => {
   console.log("Client connected Server2", socket.id, socket.client.id)
