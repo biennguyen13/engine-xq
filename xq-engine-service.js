@@ -17,7 +17,8 @@ io.on("connection", (socket) => {
   })
 
   socket.on("analyze", (msg, requestSocketId) => {
-    const uciProcess = uciProcessPooling.popReady(requestSocketId)
+    // const uciProcess = uciProcessPooling.popReadyOnly(requestSocketId)
+    const uciProcess = uciProcessPooling.popReady()
 
     if (!uciProcess) {
       io.to(socket.id).emit("analyze", {
@@ -60,19 +61,19 @@ server
     uciProcessPooling.killAll()
   })
 
-app.get("/engine", async (req, res) => {
-  const FEN = req.query.FEN ?? ""
-  const depth = req.query.depth ?? 25
+// app.get("/engine", async (req, res) => {
+//   const FEN = req.query.FEN ?? ""
+//   const depth = req.query.depth ?? 25
 
-  const uciProcess = uciProcessPooling.popReady()
+//   const uciProcess = uciProcessPooling.popReady()
 
-  if (!uciProcess) {
-    return res.send({ message: "Out of pooling" })
-  }
+//   if (!uciProcess) {
+//     return res.send({ message: "Out of pooling" })
+//   }
 
-  return res.send({
-    // message: `Depth: ${depth}, moves: ${moves}`,
-    message: `Depth: ${depth}, FEN: ${FEN}`,
-    data: await uciProcess.startAnalyze(FEN, depth),
-  })
-})
+//   return res.send({
+//     // message: `Depth: ${depth}, moves: ${moves}`,
+//     message: `Depth: ${depth}, FEN: ${FEN}`,
+//     data: await uciProcess.startAnalyze(FEN, depth),
+//   })
+// })

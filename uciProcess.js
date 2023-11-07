@@ -5,7 +5,7 @@ export default class UCIProcess {
     this.thread = thread
     this.hash = hash
     this.stepCount = 1000
-    this.timeout = 180000
+    this.timeout = 120000
     this.id = "--== Engine_" + id + " ==--"
     this.isEngineReady = false
     // this.analyze = []
